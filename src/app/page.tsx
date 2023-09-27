@@ -1,21 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import Loading from '../../components/Loading';
-import ErrorMessage from '../../components/ErrorMessage';
 
 export default function Home() {
   const [regularGoal, setRegularGoal] = useState('');
   const [smartGoal, setSmartGoal] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const convertGoal = async () => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await fetch('./api/convert.ts', {
+      const response = await fetch('http://localhost:3000/api/convert', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -25,16 +18,13 @@ export default function Home() {
 
       if (response.ok) {
         const data = await response.json();
-        setSmartGoal(data.convertedGoal);
+        setSmartGoal(data);
       } else {
-        console.error('Failed to convert goal');
-        setError('An error occured while converting the goal.');
+        console.log('response: ', response);
+        console.error('No response');
       }
     } catch (err) {
-      console.error(error);
-      setError('An unexpected error occurred.');
-    } finally {
-      setLoading(false);
+      console.error(err);
     }
   };
 
@@ -52,20 +42,11 @@ export default function Home() {
           className='bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600'
           onClick={convertGoal}
         >
-          {' '}
           Convert to S.M.A.R.T Goal
         </button>
-
         <div>
-          {Loading ? (
-            <Loading />
-          ) : (
-            <>
-              {error && <ErrorMessage message={error} />}
-              <h2 className='text-xl font-semibold'>Converted Goal:</h2>
-              <p className='mt-2'>{smartGoal}</p>
-            </>
-          )}
+          <h2 className='text-xl font-semibold'>Converted Goal:</h2>
+          <p className='mt-2'>{smartGoal}</p>
         </div>
       </div>
     </div>
